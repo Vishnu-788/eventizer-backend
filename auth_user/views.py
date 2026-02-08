@@ -18,6 +18,7 @@ class AuthView(APIView):
         return Response({
             "id": user.id,
             "username": user.username,
+            "role": user.role
         }, status=status.HTTP_201_CREATED)
 
 

@@ -17,14 +17,19 @@ class UserSerializer(serializers.Serializer):
         allow_null=False,
         validators=[UniqueValidator(queryset=User.objects.all())],
     )
-    password = serializers.CharField(allow_null=False)
+    password = serializers.CharField(write_only=True)
     role = serializers.ChoiceField(choices=UserRoles.choices, default=UserRoles.USER)
     verified = serializers.BooleanField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
 
 
     def create(self, validated_data):
+        password = validated_data.pop('password')
         if validated_data['role'] == UserRoles.USER:
             validated_data['verified'] = True
             validated_data['username'] = validated_data['username'].lower()
-        return User.objects.create(**validated_data)
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+
