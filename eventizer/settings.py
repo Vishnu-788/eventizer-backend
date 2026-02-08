@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 
-from django.conf.global_settings import AUTH_USER_MODEL
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -44,7 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # My own apps
-    'users',
+    'auth_user',
 ]
 
 REST_FRAMEWORK = {
@@ -53,7 +51,7 @@ REST_FRAMEWORK = {
     ]
 }
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'auth_user.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

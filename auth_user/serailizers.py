@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from .enums import UserRoles
-from .models import User
+from auth_user.enums import UserRoles
+from auth_user.models import User
 
 class UserSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
