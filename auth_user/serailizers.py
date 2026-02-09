@@ -1,9 +1,22 @@
+from typing import Any
+
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from auth_user.enums import UserRoles
 from auth_user.models import User
 
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data['username'] = self.user.username
+        data['role'] = self.user.role
+        data['verified'] = self.user.verified
+        return data
+
+
+# I will later convert this into ModelSerializer for more readability.
 class UserSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     username = serializers.RegexField(
@@ -32,4 +45,5 @@ class UserSerializer(serializers.Serializer):
         user.set_password(password)
         user.save()
         return user
+
 
