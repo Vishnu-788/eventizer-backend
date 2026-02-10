@@ -8,5 +8,5 @@ urlpatterns = [
     # Admin views
     path('admin/hosts/', AdminHostListView.as_view(), name='admin_list_all'),
     path('admin/hosts/<str:status>/', AdminHostListView.as_view(), name='admin_list_status'),
-    path('admin/hosts/<int:id>/update-status/', AdminHostStatusUpdateView.as_view(), name='admin_update_status'),
+    path('admin/hosts/<int:pk>/update-status/', AdminHostStatusUpdateView.as_view(), name='admin_update_status'),
 ]

@@ -9,8 +9,8 @@ are editable by the current authenticated host.
 class HostCRUDSerializer(serializers.ModelSerializer):
     class Meta:
         model=Host
-        fields=['id', 'user', 'company_name', 'company_contact_no', 'company_contact_email', 'status']
-        read_only_fields=['id', 'user', 'status']
+        fields=['user', 'company_name', 'company_contact_no', 'company_contact_email', 'status']
+        read_only_fields=['user', 'status']
 
 """
 Serializer for user.role == admin. View all the hosts or based on the request params.

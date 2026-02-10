@@ -67,5 +67,5 @@ class AdminHostStatusUpdateView(UpdateAPIView):
     permission_classes = [IsCustomAdmin]
     queryset = Host.objects.all()
     serializer_class = HostStatusUpdateSerializer
-    lookup_field = 'id'
+    lookup_field = 'pk'
 
