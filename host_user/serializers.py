@@ -13,7 +13,7 @@ class HostCRUDSerializer(serializers.ModelSerializer):
         read_only_fields=['id', 'user', 'status']
 
 """
-Serializer for user.role == admin. View all the hosts.
+Serializer for user.role == admin. View all the hosts or based on the request params.
 """
 class HostListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,9 +21,9 @@ class HostListSerializer(serializers.ModelSerializer):
         fields='__all__'
 
 """
-Serializer is for user.role == admin only. For performing update of the 'status' field to verify the host.
+Serializer is for user.role == admin only. For performing update on the 'status' field to verify the host.
+This view will update the USER model's verified flag for completing the verification.
 """
-
 class HostStatusUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model=Host
