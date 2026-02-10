@@ -43,6 +43,8 @@ INSTALLED_APPS = [
 
     # My own apps
     'auth_user',
+    'host_user',
+    'events',
 ]
 
 REST_FRAMEWORK = {

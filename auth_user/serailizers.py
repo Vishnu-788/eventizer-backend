@@ -38,9 +38,13 @@ class UserSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         password = validated_data.pop('password')
-        if validated_data['role'] == UserRoles.USER:
+        if validated_data['role'] == UserRoles.HOST:
+            # This condition is here to ensure that the user can only send host or user as the json in body.
+            pass
+        else:
+            validated_data['role'] = UserRoles.USER
             validated_data['verified'] = True
-            validated_data['username'] = validated_data['username'].lower()
+
         user = User(**validated_data)
         user.set_password(password)
         user.save()

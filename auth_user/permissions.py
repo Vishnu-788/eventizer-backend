@@ -4,8 +4,9 @@ from .enums import UserRoles
 
 class IsHost(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.role == UserRoles.HOST
+        return request.user.is_authenticated and request.user.role == UserRoles.HOST and request.user.verfied == True
 
-class IsAdmin(BasePermission):
+
+class IsCustomAdmin(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.role == UserRoles.ADMIN
+        return request.user.is_authenticated and request.user.role == UserRoles.ADMIN
