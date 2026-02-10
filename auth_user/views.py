@@ -5,6 +5,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
 from auth_user.serailizers import UserSerializer, CustomTokenObtainPairSerializer
 
@@ -47,6 +49,19 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             )
             del response.data['refresh']
         return response
+
+
+"""
+Without Overriding the TokenRefreshView, Django is not looking for the refresh token on the request cookie.
+"""
+class CookieTokenRefreshView(TokenRefreshView):
+    serializer_class = TokenRefreshSerializer
+    def post(self, request, *args, **kwargs):
+        refresh = request.COOKIES.get("refresh")
+        serializer = self.get_serializer(data={"refresh": refresh})
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data)
+
 
 
 
