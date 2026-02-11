@@ -9,7 +9,7 @@ class IsHost(BasePermission):
 
 class IsVerifiedHost(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == UserRoles.HOST and request.user.is_verified == True
+        return request.user.is_authenticated and request.user.role == UserRoles.HOST and request.user.verified == True
 
 class IsCustomAdmin(BasePermission):
     def has_permission(self, request, view):
