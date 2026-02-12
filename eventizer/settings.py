@@ -30,6 +30,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS=[
+    'http://localhost:4200'
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,6 +45,7 @@ INSTALLED_APPS = [
 
     # Third-party apps
     'rest_framework',
+    'corsheaders',
 
     # My own apps
     'auth_user',
@@ -62,6 +66,7 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = 'auth_user.User'
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
