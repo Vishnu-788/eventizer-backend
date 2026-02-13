@@ -61,6 +61,15 @@ class CookieTokenRefreshView(TokenRefreshView):
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data)
 
+class LogoutView(GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def post(self, request, *args, **kwargs):
+        response = Response({
+            'message': 'Logout successful'
+        }, status=status.HTTP_200_OK)
+        response.delete_cookie("refresh")
+        return response
+
 
 
 
