@@ -6,6 +6,6 @@ from rest_framework.response import Response
 
 
 # Create your views here.
-class BookingsView(GenericAPIView):
+class BookingCreateView(GenericAPIView):
     def post(self, request: Request) -> Response:
         pass

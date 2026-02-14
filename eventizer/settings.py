@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'host_user',
     'events',
     'bookings',
+    'payments'
 ]
 
 REST_FRAMEWORK = {
