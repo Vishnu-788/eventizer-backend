@@ -1,6 +1,6 @@
 from django.db.models import QuerySet
 from rest_framework import status
-from rest_framework.generics import GenericAPIView, ListAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 
@@ -8,7 +8,7 @@ from auth_user.permissions import IsVerifiedHost
 from host_user.models import Host
 
 from .models import Event
-from .serializers import EventSerializer
+from .serializers import EventSerializer, EventDetailSerializer
 
 """
 CRUD view for creating, reading, updating and deleting events. Accessible by verified hosts.
@@ -66,4 +66,10 @@ For users, list all the events available on the platform.
 class EventListView(ListAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+
+class EventDetailView(RetrieveAPIView):
+    queryset = Event.objects.select_related('host')
+    serializer_class = EventDetailSerializer
+    lookup_field = 'id'
+
 

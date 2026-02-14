@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from host_user.models import Host
 from .models import Event
 
 class EventSerializer(serializers.ModelSerializer):
@@ -6,4 +7,18 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         fields = '__all__'
         read_only_fields=('id', 'host')
+
+"""
+Return the details of the host along with the event details.
+"""
+class HostViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Host
+        fields = ['company_name', 'company_contact_no', 'company_contact_email']
+
+class EventDetailSerializer(serializers.ModelSerializer):
+    host = HostViewSerializer(read_only=True)
+    class Meta:
+        model = Event
+        fields = '__all__'
 
