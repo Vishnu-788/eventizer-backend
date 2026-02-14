@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from host_user.models import Host
-from .models import Event
+from .models import Event, Seat
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,3 +22,8 @@ class EventDetailSerializer(serializers.ModelSerializer):
         model = Event
         fields = '__all__'
 
+
+class SeatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Seat
+        fields = ['id', 'seat_no', 'booked']

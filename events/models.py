@@ -15,4 +15,27 @@ class Event(models.Model):
     e_category = models.CharField(max_length=100, null=False, blank=False)
     total_seats = models.IntegerField(null=False, blank=False)
     price = models.FloatField(null=False, blank=False)
-    
+
+    """
+    Pre-generate seats for a particular event whenever there is a new entry 
+    on events table. (Not Update, only when there is a new entry).
+    """
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        if is_new:
+            seats = [
+                Seat(event=self, seat_no=i) for i in range(1, self.total_seats + 1)
+            ]
+            Seat.objects.bulk_create(seats)
+
+class Seat(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='seats')
+    seat_no = models.IntegerField(null=False, blank=False)
+    booked = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('event', 'seat_no')
+
+
