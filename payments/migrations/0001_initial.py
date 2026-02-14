@@ -11,22 +11,20 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('events', '0001_initial'),
-        ('payments', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Bookings',
+            name='Payment',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('total_amount', models.FloatField()),
-                ('booking_status', models.CharField(choices=[('pending', 'Pending'), ('booked', 'Booked'), ('cancelled', 'Cancelled')], default='pending', max_length=20)),
+                ('amount', models.DecimalField(decimal_places=2, max_digits=10)),
+                ('status', models.CharField(choices=[('created', 'Created'), ('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='created', max_length=10)),
+                ('paypal_order_id', models.CharField(null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('event', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='events.event')),
-                ('payment', models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to='payments.payment')),
-                ('seats', models.ManyToManyField(to='events.seat')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),

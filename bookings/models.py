@@ -9,7 +9,7 @@ class Bookings(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     payment = models.OneToOneField(Payment, on_delete=models.CASCADE, null=True)
-    Seats = models.ManyToManyField(Seat)
+    seats = models.ManyToManyField(Seat)
     total_amount = models.FloatField(null=False, blank=False)
     booking_status = models.CharField(
         max_length=20,

@@ -43,6 +43,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 key='refresh',
                 value=refresh,
                 httponly=True,
+                max_age=60 * 60 * 24 * 7,
                 secure=False,
                 samesite='Lax'
             )
