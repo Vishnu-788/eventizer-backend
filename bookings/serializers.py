@@ -10,9 +10,10 @@ class BookingCreateSerializer(serializers.ModelSerializer):
         queryset=Seat.objects.all(),
         many=True,
     )
+
     class Meta:
         model = Bookings
-        fields = ['user', 'event', 'seats', 'total_amount', 'booking_status']
+        fields = ['id', 'user', 'event', 'seats', 'total_amount', 'booking_status']
         read_only_fields = ['user', 'total_amount', 'booking_status']
 
     def validate(self, data):

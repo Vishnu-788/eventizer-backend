@@ -9,7 +9,11 @@ from bookings.serializers import BookingCreateSerializer
 from events.models import Seat
 
 
-# Create your views here.
+"""
+Creates the booking entry with status 'PENDING'
+Returns the booking instance with id attached to it.
+Client makes another http request to payment app to initiate the payment.
+"""
 class BookingCreateView(CreateAPIView):
     serializer_class = BookingCreateSerializer
     def perform_create(self, serializer):
