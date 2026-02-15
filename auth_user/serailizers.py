@@ -5,6 +5,21 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from auth_user.enums import UserRoles
 from auth_user.models import User
 
+def username_field():
+    return serializers.RegexField(
+        regex=r'^[a-zA-Z0-9_]{3,20}$',
+        validators=[UniqueValidator(queryset=User.objects.all())],
+        error_messages={
+            "invalid": "Username must be 3–20 characters and contain only letters, numbers, or underscores."
+        }
+    )
+
+def email_field():
+    return serializers.EmailField(
+        allow_null=False,
+        validators=[UniqueValidator(queryset=User.objects.all())],
+    )
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
@@ -17,17 +32,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 # I will later convert this into ModelSerializer for more readability.
 class UserSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-    username = serializers.RegexField(
-        regex=r'^[a-zA-Z0-9_]{3,20}$',
-        validators=[UniqueValidator(queryset=User.objects.all())],
-        error_messages={
-            "invalid": "Username must be 3–20 characters and contain only letters, numbers, or underscores."
-        }
-    )
-    email = serializers.EmailField(
-        allow_null=False,
-        validators=[UniqueValidator(queryset=User.objects.all())],
-    )
+    username = username_field()
+    email = email_field()
     password = serializers.CharField(write_only=True)
     role = serializers.ChoiceField(choices=UserRoles.choices, default=UserRoles.USER)
     verified = serializers.BooleanField(read_only=True)
@@ -37,7 +43,7 @@ class UserSerializer(serializers.Serializer):
     def create(self, validated_data):
         password = validated_data.pop('password')
         if validated_data['role'] == UserRoles.HOST:
-            # This condition is here to ensure that the user can only send host or user as the json in body.
+            # This condition is here to ensure that the user can only send host or user as the role in Json body.
             pass
         else:
             validated_data['role'] = UserRoles.USER
@@ -45,7 +51,25 @@ class UserSerializer(serializers.Serializer):
 
         user = User(**validated_data)
         user.set_password(password)
+        user.is_active = True
         user.save()
         return user
+
+class UserRetrieveUpdateSerializer(serializers.Serializer):
+    username = username_field()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    email = email_field()
+    created_at = serializers.DateTimeField(read_only=True)
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
+
+
+
 
 

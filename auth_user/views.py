@@ -1,14 +1,14 @@
 
 from rest_framework import permissions, status
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
-from auth_user.serailizers import UserSerializer, CustomTokenObtainPairSerializer
-
+from .serailizers import UserSerializer, CustomTokenObtainPairSerializer, UserRetrieveUpdateSerializer
+from .models import User
 """
 For registering the user.
 """
@@ -61,6 +61,13 @@ class CookieTokenRefreshView(TokenRefreshView):
         serializer = self.get_serializer(data={"refresh": refresh})
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data)
+
+class UserRetrieveUpdateView(RetrieveUpdateAPIView):
+    serializer_class = UserRetrieveUpdateSerializer
+
+    def get_object(self) -> User:
+        return self.request.user
+
 
 class LogoutView(GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
