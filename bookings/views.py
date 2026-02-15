@@ -18,8 +18,10 @@ class BookingCreateView(CreateAPIView):
     serializer_class = BookingCreateSerializer
     def perform_create(self, serializer):
         seat_ids = self.request.data.get("seats")
+        print(seat_ids)
 
         with transaction.atomic():
             # Lock seats
             seats = Seat.objects.select_for_update().filter(id__in=seat_ids)
+            print(seats)
             serializer.save(user=self.request.user)
