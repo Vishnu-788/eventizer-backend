@@ -33,9 +33,7 @@ class BookingCreateSerializer(serializers.ModelSerializer):
         validated_data['total_amount'] = validated_data['event'].price * len(validated_data['seats'])
         seats = validated_data.pop('seats')
         booking = Bookings.objects.create(**validated_data, booking_status=BookingStatus.PENDING)
-        print(f"Booking Seats: {booking.seats}")
         booking.seats.set(seats)
-        print(f"Booking Seats: {seats}")
         return booking
 
 

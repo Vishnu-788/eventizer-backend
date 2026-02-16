@@ -5,3 +5,4 @@ class Status(models.TextChoices):
     PENDING='pending'
     APPROVED='approved'
     REJECTED='rejected'
+    COMPLETED='completed'

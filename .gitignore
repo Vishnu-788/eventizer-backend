@@ -47,3 +47,7 @@ staticfiles/
 # ========================
 .DS_Store
 Thumbs.db
+
+user.json
+events.json
+host.json

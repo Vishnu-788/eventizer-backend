@@ -14,7 +14,7 @@ class Payment(models.Model):
         choices=Status,
         default=Status.CREATED,
     )
-    paypal_order_id = models.CharField(null=True)
+    paypal_order_id = models.CharField(unique=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
