@@ -1,5 +1,5 @@
 from django.db import transaction
-from rest_framework.generics import GenericAPIView, CreateAPIView
+from rest_framework.generics import GenericAPIView, CreateAPIView, RetrieveAPIView
 from bookings.serializers import BookingCreateSerializer
 from events.models import Seat
 
@@ -15,5 +15,6 @@ class BookingCreateView(CreateAPIView):
         seat_ids = self.request.data.get("seats")
         with transaction.atomic():
             seats = Seat.objects.select_for_update().filter(id__in=seat_ids)
-            print(seats)
             serializer.save(user=self.request.user)
+
+

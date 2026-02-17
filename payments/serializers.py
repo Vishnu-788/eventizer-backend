@@ -6,3 +6,8 @@ class PaymentCreateSerializer(serializers.ModelSerializer):
         model = Payment
         fields = ['id', 'user', 'booking', 'amount', 'status']
         read_only_fields = ['id', 'user', 'booking', 'amount', 'status']
+
+class PaymentStatusPollSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ['status']

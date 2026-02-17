@@ -86,7 +86,8 @@ def handle_checkout_approved(event):
 
     payment_id = resource["purchase_units"][0]["reference_id"]
     payment = Payment.objects.get(id=payment_id)
-    if payment.status != Status.PENDING:
+    if payment.status != Status.CREATED:
+        print(f"Exited: Payment status is not pending. \nPayment ID: {payment_id}\nPayment Status: {payment.status}" )
         return
     payment.paypal_order_id = paypal_order_id
     payment.status = Status.APPROVED
@@ -99,6 +100,7 @@ def handle_capture_completed(event):
     amount = Decimal(amount_str)
     payment = Payment.objects.get(paypal_order_id=paypal_order_id)
     if payment.status != Status.APPROVED:
+        print("HANDLE CAPTURE RETURNED")
         return
     payment.status = Status.COMPLETED
     payment.amount = amount
@@ -126,6 +128,7 @@ def handle_payment_failed(event):
     payment = Payment.objects.select_related("booking").get(paypal_order_id=order_id)
     booking = payment.booking
     if payment.status in (Status.REJECTED, Status.COMPLETED):
+        print("PAYMENT FAILED")
         return
     payment.status=Status.REJECTED
     booking.booking_status=BookingStatus.CANCELLED

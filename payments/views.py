@@ -1,13 +1,14 @@
 from typing import Any
+import json
 from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import get_object_or_404, CreateAPIView, GenericAPIView
+from rest_framework.generics import get_object_or_404, CreateAPIView, GenericAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from bookings.models import Bookings
-from payments.serializers import PaymentCreateSerializer
 from bookings.enums import BookingStatus
+from .serializers import PaymentCreateSerializer, PaymentStatusPollSerializer
 from .models import Payment
 from .services import create_paypal_order, handle_checkout_approved, update_bookings_table, handle_capture_completed, handle_payment_failed
 
@@ -82,17 +83,29 @@ class PayPalWebHook(GenericAPIView):
     def post(self, request, *args, **kwargs):
         event = request.data
         event_type = event.get("event_type")
+        print("\n====== PAYPAL WEBHOOK RECEIVED ======")
+        print("EVENT TYPE:", event.get("event_type"))
+        print(json.dumps(event, indent=2))
+        print("====== END WEBHOOK ======")
 
         if event_type == "CHECKOUT.ORDER.APPROVED":
+            print("CHECKOUT.ORDER.APPROVED")
             handle_checkout_approved(event)
 
         elif event_type == "PAYMENT.CAPTURE.COMPLETED":
+            print("PAYMENT.CAPTURE.COMPLETED")
             handle_capture_completed(event)
 
         elif event_type == "PAYMENT.CAPTURE.FAILED":
+            print("PAYMENT.CAPTURE.FAILED")
             handle_payment_failed(event)
-
         return HttpResponse(status=200)
+
+class PaymentStatusPollingView(RetrieveAPIView):
+    queryset = Payment.objects.all()
+    lookup_field = 'paypal_order_id'
+    lookup_url_kwarg = 'order_id'
+    serializer_class = PaymentStatusPollSerializer
 
 
 
