@@ -2,6 +2,11 @@ from rest_framework import serializers
 from host_user.models import Host
 from .models import Event, Seat
 
+class EventListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ['id', 'e_title', 'e_start_time', 'e_category', 'price', 'e_venue']
+
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
