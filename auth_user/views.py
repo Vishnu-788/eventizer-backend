@@ -3,6 +3,7 @@ from rest_framework import permissions, status
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
@@ -57,10 +58,24 @@ Without Overriding the TokenRefreshView, Django is not looking for the refresh t
 class CookieTokenRefreshView(TokenRefreshView):
     serializer_class = TokenRefreshSerializer
     def post(self, request, *args, **kwargs):
-        refresh = request.COOKIES.get("refresh")
-        serializer = self.get_serializer(data={"refresh": refresh})
+        refresh_token = request.COOKIES.get("refresh")
+
+        serializer = self.get_serializer(data={"refresh": refresh_token})
         serializer.is_valid(raise_exception=True)
-        return Response(serializer.validated_data)
+
+        # Get user from refresh token
+        token = RefreshToken(refresh_token)
+        user_id = token["user_id"]
+        user = User.objects.get(id=user_id)
+
+        return Response({
+            "access": serializer.validated_data["access"],
+            "username": user.username,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "role": user.role,
+            "verified": user.verified
+        })
 
 class UserRetrieveUpdateView(RetrieveUpdateAPIView):
     serializer_class = UserRetrieveUpdateSerializer

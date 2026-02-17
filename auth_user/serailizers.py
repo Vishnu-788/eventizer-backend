@@ -26,6 +26,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['username'] = self.user.username
         data['role'] = self.user.role
         data['verified'] = self.user.verified
+        data['first_name'] = self.user.first_name
+        data['last_name'] = self.user.last_name
         return data
 
 

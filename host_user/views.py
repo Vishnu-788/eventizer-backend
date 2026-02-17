@@ -1,13 +1,16 @@
 from urllib.request import Request
 
 from django.db.models import QuerySet
-from rest_framework.generics import GenericAPIView, get_object_or_404, ListAPIView, UpdateAPIView
+from rest_framework.exceptions import NotFound
+from rest_framework.generics import GenericAPIView, get_object_or_404, ListAPIView, UpdateAPIView, RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
+from auth_user.models import User
 from auth_user.permissions import IsHost, IsCustomAdmin
 
-from .serializers import HostCRUDSerializer, HostListSerializer, HostStatusUpdateSerializer
+from .serializers import HostCRUDSerializer, HostListSerializer, HostStatusUpdateSerializer, HostDetailSerializer
 from .models import Host
 
 
@@ -44,6 +47,22 @@ class HostCRUDView(GenericAPIView):
 
     def delete(self):
         pass
+
+class HostDetailView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated, IsHost]
+    serializer_class = HostDetailSerializer
+    lookup_url_kwarg = 'username'
+
+    def get_object(self):
+        username = self.kwargs.get(self.lookup_url_kwarg)
+        user = get_object_or_404(User, username=username)
+
+        try:
+            host = Host.objects.get(user=user)
+        except Host.DoesNotExist:
+            raise NotFound(detail={"code": "verification_not_started"})
+        return host
+
 
 """
 Custom Admin view.
