@@ -1,7 +1,10 @@
 from django.db import transaction
-from rest_framework.generics import GenericAPIView, CreateAPIView, RetrieveAPIView
-from bookings.serializers import BookingCreateSerializer
+from rest_framework.generics import GenericAPIView, CreateAPIView, RetrieveAPIView, ListAPIView
+
+from auth_user.permissions import IsVerifiedHost
+from bookings.serializers import BookingCreateSerializer, BookingEventListSerializer
 from events.models import Seat
+from .models import Bookings
 
 
 """
@@ -16,5 +19,18 @@ class BookingCreateView(CreateAPIView):
         with transaction.atomic():
             seats = Seat.objects.select_for_update().filter(id__in=seat_ids)
             serializer.save(user=self.request.user)
+
+"""
+Return the bookings of a particular event.
+event id received from the url parameter.
+returns the list of booking for that particular event.
+"""
+class BookingListView(ListAPIView):
+    permission_classes = [IsVerifiedHost]
+    serializer_class = BookingEventListSerializer
+    lookup_url_kwarg = 'event_id'
+    def get_queryset(self):
+        return Bookings.objects.filter(event=self.kwargs['event_id'])
+
 
 

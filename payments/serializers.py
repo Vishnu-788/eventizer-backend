@@ -11,3 +11,8 @@ class PaymentStatusPollSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = ['status']
+
+class PaymentListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = '__all__'

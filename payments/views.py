@@ -3,15 +3,17 @@ import json
 from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import get_object_or_404, CreateAPIView, GenericAPIView, RetrieveAPIView
+from rest_framework.generics import get_object_or_404, CreateAPIView, GenericAPIView, RetrieveAPIView, ListAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+
+from auth_user.permissions import IsVerifiedHost
 from bookings.models import Bookings
 from bookings.enums import BookingStatus
-from .serializers import PaymentCreateSerializer, PaymentStatusPollSerializer
+from .serializers import PaymentCreateSerializer, PaymentStatusPollSerializer, PaymentListSerializer
 from .models import Payment
 from .services import create_paypal_order, handle_checkout_approved, update_bookings_table, handle_capture_completed, handle_payment_failed
-
+from auth_user.enums import UserRoles
 """
 Receives the booking id from the url. CHeck if a booking exists with that id and check its status. 
 If booking exists check it booking status field. if its 'PENDING' -> 
@@ -100,6 +102,13 @@ class PayPalWebHook(GenericAPIView):
             print("PAYMENT.CAPTURE.FAILED")
             handle_payment_failed(event)
         return HttpResponse(status=200)
+
+class UserPaymentListView(ListAPIView):
+    serializer_class = PaymentListSerializer
+
+    def get_queryset(self):
+        return Payment.objects.filter(user=self.request.user)
+
 
 class PaymentStatusPollingView(RetrieveAPIView):
     queryset = Payment.objects.all()

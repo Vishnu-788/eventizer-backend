@@ -36,4 +36,9 @@ class BookingCreateSerializer(serializers.ModelSerializer):
         booking.seats.set(seats)
         return booking
 
+class BookingEventListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Bookings
+        fields='__all__'
+
 
