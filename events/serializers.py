@@ -21,20 +21,17 @@ class EventSerializer(serializers.ModelSerializer):
         start = data.get('e_start_time')
         end = data.get('e_end_time')
 
-        today = timezone.now()
-        min_interval_date = today + timedelta(days=5)
+        today = timezone.localdate()
         e_date = datetime.combine(e_date, datetime.min.time())
-
-        # if e_date <  min_interval_date:
-        #     raise serializers.ValidationError({
-        #         'detail': "Event data should be scheduled before 5 days at least."
-        #     })
-        #
-        #
-        # if e_date < today:
-        #     raise serializers.ValidationError({
-        #         'detail': "Event date is in past. Invalid date"
-        #     })
+        if isinstance(e_date, datetime):
+            if timezone.is_naive(e_date):
+                e_date = e_date.date()
+            else:
+                e_date = e_date.astimezone(timezone.get_current_timezone()).date()
+        if e_date < today:
+            raise serializers.ValidationError({
+                'detail': "Event date is in past. Invalid date"
+            })
 
         if start and end:
             start_dt = datetime.combine(today, start)

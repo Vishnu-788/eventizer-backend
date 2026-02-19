@@ -32,6 +32,10 @@ PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID')
 PAYPAL_CLIENT_SECRET = os.getenv('PAYPAL_CLIENT_SECRET')
 PAYPAL_BASE_URL = os.getenv('PAYPAL_BASE_URL')
 
+TIME_ZONE = 'Asia/Kolkata'
+USE_TZ = True
+
+
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
@@ -144,11 +148,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_TZ = True
+
 
 
 # Static files (CSS, JavaScript, Images)
