@@ -1,64 +1,38 @@
-from urllib.request import Request
-
 from django.db.models import QuerySet
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import GenericAPIView, get_object_or_404, ListAPIView, UpdateAPIView, RetrieveAPIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.generics import get_object_or_404, ListAPIView, UpdateAPIView, RetrieveAPIView, CreateAPIView, \
+    RetrieveUpdateAPIView
+from auth_user.permissions import IsHost, IsCustomAdmin, IsVerifiedHost
 
-from auth_user.models import User
-from auth_user.permissions import IsHost, IsCustomAdmin
-
-from .serializers import HostCRUDSerializer, HostListSerializer, HostStatusUpdateSerializer, HostDetailSerializer
+from .serializers import HostCreateSerializer, HostListSerializer, HostStatusUpdateSerializer, HostSerializer
 from .models import Host
 
 
 """
-This view is for user with role 'host'. They can update the other fields except the status field which can updated
-only via 'admin' user.
+View for User.Role == 'Host'.
+Host must have a entry in the user table.
 """
-class HostCRUDView(GenericAPIView):
+class HostCreateView(CreateAPIView):
     permission_classes = [IsHost]
-    serializer_class = HostCRUDSerializer
+    serializer_class = HostCreateSerializer
 
-    def get_object(self) -> Host:
-        return get_object_or_404(Host, user=self.request.user)
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
-    def get(self, request: Request) -> Response:
-        host = self.get_object()
-        serializer = self.get_serializer(host)
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK
-        )
-
-    def post(self, request: Request) -> Response:
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user = self.request.user)
-        return Response(
-            {"success": "Successfully created."},
-            status=status.HTTP_201_CREATED
-        )
-
-    def patch(self):
-        pass
-
-    def delete(self):
-        pass
-
-class HostDetailView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated, IsHost]
-    serializer_class = HostDetailSerializer
-    lookup_url_kwarg = 'username'
+class HostDetailUpdateView(RetrieveUpdateAPIView):
+    permission_classes = [IsVerifiedHost]
+    serializer_class = HostSerializer
 
     def get_object(self):
-        username = self.kwargs.get(self.lookup_url_kwarg)
-        user = get_object_or_404(User, username=username)
+        return Host.objects.get(user=self.request.user)
 
+class HostNotVerifiedView(RetrieveAPIView):
+    permission_classes = [IsHost]
+    serializer_class = HostSerializer
+
+    def get_object(self):
         try:
-            host = Host.objects.get(user=user)
+            host = Host.objects.get(user=self.request.user)
         except Host.DoesNotExist:
             raise NotFound(detail={"code": "verification_not_started"})
         return host
@@ -79,7 +53,6 @@ class AdminHostListView(ListAPIView):
             query_set = Host.objects.filter(status=status_param)
         else:
             query_set = Host.objects.all()
-        print(query_set)
         return query_set
 
 class AdminHostStatusUpdateView(UpdateAPIView):

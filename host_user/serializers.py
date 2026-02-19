@@ -1,25 +1,39 @@
 from rest_framework import serializers
+
+from auth_user.serailizers import UserRetrieveUpdateSerializer
 from .models import Host
 
-"""
-Serializer is for performing CRUD operations by the user.role == host.
-All the other fields except id, user, status of the current authenticated host 
-are editable by the current authenticated host.
-"""
-class HostCRUDSerializer(serializers.ModelSerializer):
+class HostCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model=Host
         fields=['user', 'company_name', 'company_contact_no', 'company_contact_email', 'status']
         read_only_fields=['user', 'status']
 
-class HostDetailSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
-    first_name = serializers.CharField(source='user.first_name', read_only=True)
-    last_name = serializers.CharField(source='user.last_name', read_only=True)
-    email = serializers.CharField(source='user.email', read_only=True)
+"""
+For update and detailed view of the verified host.
+"""
+class HostSerializer(serializers.ModelSerializer):
+    user = UserRetrieveUpdateSerializer()
     class Meta:
         model=Host
-        fields=['user', 'company_name', 'company_contact_no', 'company_contact_email', 'status']
+        fields=['user', 'company_name', 'company_contact_email', 'company_contact_no', 'status']
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', None)
+
+        for attr, val in validated_data.items():
+            setattr(instance, attr, val)
+        instance.save()
+
+        if user_data:
+            user = instance.user
+            for attr, val in user_data.items():
+                setattr(user, attr, val)
+            user.save()
+        return instance
+
+
+
 
 """
 Serializer for user.role == admin. View all the hosts or based on the request params.

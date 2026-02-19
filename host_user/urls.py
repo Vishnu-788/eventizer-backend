@@ -1,13 +1,15 @@
 from django.urls import path
 
-from host_user.views import HostCRUDView, AdminHostListView, AdminHostStatusUpdateView, HostDetailView
+from host_user.views import AdminHostListView, AdminHostStatusUpdateView, HostCreateView, HostDetailUpdateView, \
+    HostNotVerifiedView
 
 urlpatterns = [
-    path('host/', HostCRUDView.as_view(), name='hostCRUD'),
-    path('host/<str:username>/', HostDetailView.as_view(), name='host-detail'),
+    path('me/', HostDetailUpdateView.as_view(), name='host_detail_update'),
+    path('me/not-verified/', HostNotVerifiedView.as_view(), name='host_not_verified'),
+    path('create/', HostCreateView.as_view(), name='create_host'),
 
     # Admin views
-    path('admin/hosts/', AdminHostListView.as_view(), name='admin_list_all'),
-    path('admin/hosts/<str:status>/', AdminHostListView.as_view(), name='admin_list_status'),
-    path('admin/hosts/<int:pk>/update-status/', AdminHostStatusUpdateView.as_view(), name='admin_update_status'),
+    path('admin/', AdminHostListView.as_view(), name='admin_list_all'),
+    path('admin/<str:status>/', AdminHostListView.as_view(), name='admin_list_status'),
+    path('admin/<int:pk>/update-status/', AdminHostStatusUpdateView.as_view(), name='admin_update_status'),
 ]
