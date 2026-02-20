@@ -7,7 +7,7 @@ from host_user.models import Host
 class Event(models.Model):
     host = models.ForeignKey(Host, on_delete=models.CASCADE, null=False, blank=False)
     e_title = models.CharField(max_length=100, null=False, blank=False)
-    e_description = models.TextField(max_length=500)
+    e_description = models.TextField(max_length=3000)
     e_venue = models.CharField(max_length=100, null=False, blank=False)
     e_date = models.DateField(null=False, blank=False)
     e_start_time = models.TimeField(null=False, blank=False)
