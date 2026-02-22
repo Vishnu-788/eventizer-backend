@@ -32,6 +32,8 @@ PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID')
 PAYPAL_CLIENT_SECRET = os.getenv('PAYPAL_CLIENT_SECRET')
 PAYPAL_BASE_URL = os.getenv('PAYPAL_BASE_URL')
 
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+
 TIME_ZONE = 'Asia/Kolkata'
 USE_TZ = True
 
@@ -68,7 +70,8 @@ INSTALLED_APPS = [
     'events',
     'bookings',
     'payments',
-    'tickets'
+    'tickets',
+    'llm_rag'
 ]
 
 REST_FRAMEWORK = {

@@ -5,6 +5,7 @@ from rest_framework.request import Request
 
 from auth_user.permissions import IsVerifiedHost
 from host_user.models import Host
+from llm_rag.services.llm_service import create_embeddings
 
 from .models import Event, Seat
 from .serializers import EventSerializer, EventDetailSerializer, SeatSerializer, EventListSerializer
@@ -24,7 +25,8 @@ class HostEventCreateView(CreateAPIView):
 
     def perform_create(self, serializer):
         host = self.request.user.host
-        serializer.save(host=host)
+        event = serializer.save(host=host)
+        create_embeddings(event)
 
 class HostEventDetailView(RetrieveAPIView):
     serializer_class = EventDetailSerializer

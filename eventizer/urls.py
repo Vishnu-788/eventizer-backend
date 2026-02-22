@@ -26,4 +26,5 @@ urlpatterns = [
     path('api/v1/payments/', include('payments.urls')),
     path('api/v1/bookings/', include('bookings.urls')),
     path('api/v1/tickets/', include('tickets.urls')),
+    path('api/v1/chatbot/', include('llm_rag.urls'))
 ]
