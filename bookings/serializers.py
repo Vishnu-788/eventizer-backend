@@ -10,7 +10,6 @@ class BookingCreateSerializer(serializers.ModelSerializer):
         queryset=Seat.objects.all(),
         many=True,
     )
-
     class Meta:
         model = Bookings
         fields = ['id', 'user', 'event', 'seats', 'total_amount', 'booking_status']
@@ -35,6 +34,15 @@ class BookingCreateSerializer(serializers.ModelSerializer):
         booking = Bookings.objects.create(**validated_data, booking_status=BookingStatus.PENDING)
         booking.seats.set(seats)
         return booking
+
+class BookingUserListSerializer(serializers.ModelSerializer):
+    event_name = serializers.CharField(source='event.e_title', read_only=True)
+    seat_count = serializers.IntegerField(read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    email = serializers.CharField(source='user.email', read_only=True)
+    class Meta:
+        model = Bookings
+        fields = ['id', 'username', 'email', 'event_name', 'total_amount', 'booking_status', 'seat_count']
 
 class BookingEventListSerializer(serializers.ModelSerializer):
     class Meta:
