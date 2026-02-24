@@ -62,7 +62,9 @@ class UserRetrieveUpdateSerializer(serializers.Serializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     email = email_field()
+    role = serializers.ChoiceField(choices=UserRoles.choices, read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
+    verified = serializers.BooleanField(read_only=True)
 
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():

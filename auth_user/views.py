@@ -84,7 +84,6 @@ class UserRetrieveUpdateView(RetrieveUpdateAPIView):
     def get_object(self) -> User:
         return self.request.user
 
-
 class LogoutView(GenericAPIView):
     permission_classes = [AllowAny]
     def post(self, request, *args, **kwargs):
