@@ -71,7 +71,8 @@ INSTALLED_APPS = [
     'bookings',
     'payments',
     'tickets',
-    'llm_rag'
+    'llm_rag',
+    'analytics',
 ]
 
 REST_FRAMEWORK = {
