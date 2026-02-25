@@ -5,7 +5,7 @@ from events.models import Event
 class DailyEventsTable(models.Model):
     date = models.DateField()
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    tickets_sold = models.IntegerField(default=0)
+    seats_sold = models.IntegerField(default=0)
     revenue = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     class Meta:
@@ -15,6 +15,6 @@ class DailyEventsTable(models.Model):
 
 class EventTotal(models.Model):
     event_id = models.ForeignKey(Event, on_delete=models.CASCADE)
-    total_tickets = models.IntegerField(default=0)
+    total_seats_sold = models.IntegerField(default=0)
     total_revenue = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     last_booking_at = models.DateTimeField()

@@ -44,6 +44,7 @@ class BookingListView(ListAPIView):
     lookup_url_kwarg = 'event_id'
     def get_queryset(self):
         return Bookings.objects.filter(event=self.kwargs['event_id'])
+    
 
 
 

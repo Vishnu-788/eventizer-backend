@@ -4,6 +4,8 @@ import requests
 from requests.auth import HTTPBasicAuth
 from django.conf import settings
 from datetime import datetime
+
+from analytics.services import update_daily_events_table
 from bookings.models import Bookings
 from payments.models import Payment
 from tickets.models import Ticket
@@ -112,6 +114,7 @@ def update_bookings_table(booking: Bookings, amount):
     booking.seats.update(booked=True)
     booking.save(update_fields=["booking_status"])
     generate_ticket(booking, amount)
+    update_daily_events_table(booking)
 
 def generate_ticket(booking: Bookings, amount):
     event = booking.event
