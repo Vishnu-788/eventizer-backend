@@ -5,14 +5,17 @@ from requests.auth import HTTPBasicAuth
 from django.conf import settings
 from datetime import datetime
 
-from analytics.services import update_daily_events_table
+from analytics.services import update_daily_events_table, update_analytics_table
 from bookings.models import Bookings
 from payments.models import Payment
 from tickets.models import Ticket
 from .enums import Status
 from bookings.enums import BookingStatus
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
+import pytz
 
-
+IST = pytz.timezone("Asia/Kolkata")
 def get_paypal_token():
     url = "https://api-m.sandbox.paypal.com/v1/oauth2/token"
 
@@ -99,6 +102,11 @@ def handle_checkout_approved(event):
 def handle_capture_completed(event):
     paypal_order_id = event["resource"]["supplementary_data"]["related_ids"]["order_id"]
     amount_str = event["resource"]["amount"]["value"]
+    payment_time_utc = parse_datetime(event["resource"]["create_time"])
+
+    # Convert to IST for daily analytics grouping
+    payment_time_ist = payment_time_utc.astimezone(IST)
+    payment_date = payment_time_ist.date()
     amount = Decimal(amount_str)
     payment = Payment.objects.get(paypal_order_id=paypal_order_id)
     if payment.status != Status.APPROVED:
@@ -108,13 +116,13 @@ def handle_capture_completed(event):
     payment.amount = amount
     payment.save(update_fields=["amount", "status"])
     update_bookings_table(payment.booking, amount)
+    update_analytics_table(payment.booking, payment_date)
 
 def update_bookings_table(booking: Bookings, amount):
     booking.booking_status = BookingStatus.BOOKED
     booking.seats.update(booked=True)
     booking.save(update_fields=["booking_status"])
     generate_ticket(booking, amount)
-    update_daily_events_table(booking)
 
 def generate_ticket(booking: Bookings, amount):
     event = booking.event
