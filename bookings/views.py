@@ -7,6 +7,7 @@ from auth_user.permissions import IsVerifiedHost
 from bookings.serializers import BookingCreateSerializer, BookingEventListSerializer, BookingUserListSerializer
 from events.models import Seat
 from .models import Bookings
+from host_user.models import Host
 
 
 """
@@ -38,12 +39,17 @@ Return the bookings of a particular event.
 event id received from the url parameter.
 returns the list of booking for that particular event.
 """
-class BookingListView(ListAPIView):
+class BookingHostListView(ListAPIView):
     permission_classes = [IsVerifiedHost]
     serializer_class = BookingEventListSerializer
     lookup_url_kwarg = 'event_id'
     def get_queryset(self):
-        return Bookings.objects.filter(event=self.kwargs['event_id'])
+        host = Host.objects.filter(user=self.request.user).first()
+        return (
+            Bookings.objects
+                .filter(event=self.kwargs['event_id'], event__host=host)
+                .select_related("event", "event__host")
+        )
 
 
 
