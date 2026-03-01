@@ -44,7 +44,15 @@ class BookingUserListSerializer(serializers.ModelSerializer):
         model = Bookings
         fields = ['id', 'username', 'email', 'event_name', 'total_amount', 'booking_status', 'seat_count']
 
+class SeatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Seat
+        fields = ['id', 'seat_no']
+
 class BookingEventListSerializer(serializers.ModelSerializer):
+    seats = SeatSerializer(many=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    email = serializers.CharField(source='user.email', read_only=True)
     class Meta:
         model=Bookings
         fields='__all__'

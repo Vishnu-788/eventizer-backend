@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Prefetch
 from django.db.models.aggregates import Count
 from rest_framework.generics import GenericAPIView, CreateAPIView, RetrieveAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -48,7 +49,10 @@ class BookingHostListView(ListAPIView):
         return (
             Bookings.objects
                 .filter(event=self.kwargs['event_id'], event__host=host)
-                .select_related("event", "event__host")
+                .select_related("event", "event__host", "user")
+                .prefetch_related(
+                     Prefetch('seats', queryset=Seat.objects.all())
+                )
         )
 
 
