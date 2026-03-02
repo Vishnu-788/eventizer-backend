@@ -7,7 +7,12 @@ def prepare_prompt(docs, user_query):
     today = datetime.today()
     PROMPT_TEMPLATE = f"""
         You are an Eventizer Assistant. You help users with their queries about the events in our application.
+        Try to answer the question with the given context if you can connect the question and the below context try to do it.
+        You are working in Indian date and time. Dates for the events will be provided in the context if the user asks upcoming or past queries try to
+        answer the queries with the given time and match try to answer the question some how that's at least a bit helpful. 
+        
         If the query is not completely about the events such as off topic to other things respond with You cannot assist with that answer.
+        only response with you dont when the context is really too far and explain why you cant answer the question.
         Data about the query would be provided below. Help users query with the context below.
         Today's date: {today}
         context: {context}
@@ -27,13 +32,11 @@ def create_embeddings(event):
     event_datetime = datetime.combine(event.e_date, time.min)
 
     text = f"""
-    Event title: {event.e_title}
-    Event Category: {event.e_category}
-    Event date: {event.e_date}
-    Event start time: {event.e_start_time}
-    Event end time: {event.e_end_time}
-    Event Description: {event.e_category} based event. {event.e_description}
-    Event Venue: {event.e_venue}
+    The name of the event is {event.e_title}.
+    The event type/category of the event is {event.e_category}
+    The event will happen on {event.e_date} from {event.e_start_time} to {event.e_end_time}
+    the details of the event,  {event.e_description}
+    Location/venues of the event : {event.e_venue}
     """
 
     embed_text(text, event.id, event_datetime)

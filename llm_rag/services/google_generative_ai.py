@@ -2,8 +2,9 @@ from django.conf import settings
 from google import genai
 from google.genai import types
 
-GEMINI_API_KEY = settings.GEMINI_API_KEY
+from eventizer.settings import GEMINI_API_KEY
 
+# GEMINI_API_KEY = settings.GEMINI_API_KEY
 def get_client():
     return genai.Client(api_key=GEMINI_API_KEY)
 
