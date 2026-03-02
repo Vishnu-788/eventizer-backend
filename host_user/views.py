@@ -4,7 +4,7 @@ from rest_framework.generics import get_object_or_404, ListAPIView, UpdateAPIVie
     RetrieveUpdateAPIView
 from auth_user.permissions import IsHost, IsCustomAdmin, IsVerifiedHost
 
-from .serializers import HostCreateSerializer, HostListSerializer, HostStatusUpdateSerializer, HostSerializer
+from .serializers import HostCreateSerializer, HostStatusUpdateSerializer, HostSerializer
 from .models import Host
 
 
@@ -46,7 +46,7 @@ If query params == 'rejected': returns all the hosts with status field marked as
 """
 class AdminHostListView(ListAPIView):
     permission_classes = [IsCustomAdmin]
-    serializer_class = HostListSerializer
+    serializer_class = HostSerializer
     def get_queryset(self) -> QuerySet:
         status_param = self.request.query_params.get("status")
         if status_param:

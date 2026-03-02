@@ -33,16 +33,6 @@ class HostSerializer(serializers.ModelSerializer):
         return instance
 
 
-
-
-"""
-Serializer for user.role == admin. View all the hosts or based on the request params.
-"""
-class HostListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=Host
-        fields='__all__'
-
 """
 Serializer is for user.role == admin only. For performing update on the 'status' field to verify the host.
 This view will update the USER model's verified flag for completing the verification.
