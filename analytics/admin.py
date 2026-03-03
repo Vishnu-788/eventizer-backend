@@ -3,3 +3,4 @@ from .models import DailyEventsTable, EventTotal
 
 # Register your models here.
 admin.site.register(DailyEventsTable)
+admin.site.register(EventTotal)

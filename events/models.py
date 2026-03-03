@@ -1,5 +1,4 @@
 from django.db import models
-
 from host_user.models import Host
 
 
@@ -20,6 +19,7 @@ class Event(models.Model):
     Pre-generate seats for a particular event whenever there is a new entry 
     on events table. (Not Update, only when there is a new entry).
     """
+
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         super().save(*args, **kwargs)
@@ -30,12 +30,11 @@ class Event(models.Model):
             ]
             Seat.objects.bulk_create(seats)
 
+
 class Seat(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='seats')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="seats")
     seat_no = models.IntegerField(null=False, blank=False)
     booked = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ('event', 'seat_no')
-
-
+        unique_together = ("event", "seat_no")
