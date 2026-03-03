@@ -19,12 +19,13 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/v1/auth/', include('auth_user.urls')),
-    path('api/v1/hosts/', include('host_user.urls')),
-    path('api/v1/events/', include('events.urls')),
-    path('api/v1/payments/', include('payments.urls')),
-    path('api/v1/bookings/', include('bookings.urls')),
-    path('api/v1/tickets/', include('tickets.urls')),
-    path('api/v1/chatbot/', include('llm_rag.urls'))
+    path("admin/", admin.site.urls),
+    path("api/v1/auth/", include("auth_user.urls")),
+    path("api/v1/hosts/", include("host_user.urls")),
+    path("api/v1/events/", include("events.urls")),
+    path("api/v1/payments/", include("payments.urls")),
+    path("api/v1/bookings/", include("bookings.urls")),
+    path("api/v1/tickets/", include("tickets.urls")),
+    path("api/v1/chatbot/", include("llm_rag.urls")),
+    path("api/v1/analytics/", include("analytics.urls")),
 ]
