@@ -5,14 +5,16 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from auth_user.enums import UserRoles
 from auth_user.models import User
 
+
 def username_field():
     return serializers.RegexField(
-        regex=r'^[a-zA-Z0-9_]{3,20}$',
+        regex=r"^[a-zA-Z0-9_]{3,20}$",
         validators=[UniqueValidator(queryset=User.objects.all())],
         error_messages={
             "invalid": "Username must be 3–20 characters and contain only letters, numbers, or underscores."
-        }
+        },
     )
+
 
 def email_field():
     return serializers.EmailField(
@@ -20,14 +22,15 @@ def email_field():
         validators=[UniqueValidator(queryset=User.objects.all())],
     )
 
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
-        data['username'] = self.user.username
-        data['role'] = self.user.role
-        data['verified'] = self.user.verified
-        data['first_name'] = self.user.first_name
-        data['last_name'] = self.user.last_name
+        data["username"] = self.user.username
+        data["role"] = self.user.role
+        data["verified"] = self.user.verified
+        data["first_name"] = self.user.first_name
+        data["last_name"] = self.user.last_name
         return data
 
 
@@ -41,15 +44,14 @@ class UserSerializer(serializers.Serializer):
     verified = serializers.BooleanField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
 
-
     def create(self, validated_data):
-        password = validated_data.pop('password')
-        if validated_data['role'] == UserRoles.HOST:
+        password = validated_data.pop("password")
+        if validated_data["role"] == UserRoles.HOST:
             # This condition is here to ensure that the user can only send host or user as the role in Json body.
             pass
         else:
-            validated_data['role'] = UserRoles.USER
-            validated_data['verified'] = True
+            validated_data["role"] = UserRoles.USER
+            validated_data["verified"] = True
 
         user = User(**validated_data)
         user.set_password(password)
@@ -57,7 +59,9 @@ class UserSerializer(serializers.Serializer):
         user.save()
         return user
 
+
 class UserRetrieveUpdateSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
     username = username_field()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
@@ -71,9 +75,3 @@ class UserRetrieveUpdateSerializer(serializers.Serializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
-
-
-
-
-
-
