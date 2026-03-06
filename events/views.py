@@ -18,6 +18,7 @@ from .serializers import (
     EventDetailSerializer,
     SeatSerializer,
     EventListSerializer,
+    EventIdNameSerializer,
 )
 
 

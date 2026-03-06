@@ -62,6 +62,12 @@ class EventSerializer(serializers.ModelSerializer):
         return data
 
 
+class EventIdNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        field = ["id", "e_title"]
+
+
 """
 Return the details of the host along with the event details.
 """
