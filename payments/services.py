@@ -126,7 +126,7 @@ def update_bookings_table(booking: Bookings, amount):
 
 def generate_ticket(booking: Bookings, amount):
     event = booking.event
-    expires = datetime.combine(event.e_date, event.e_end_time)
+    expires = event.e_end_time
     ticket = Ticket.objects.create(
         booking=booking,
         amount=amount,
