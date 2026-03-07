@@ -3,11 +3,20 @@ from chromadb import HttpClient
 from .date_filter import get_date_filter
 from .google_generative_ai import get_embeddings
 from datetime import datetime
+from httpcore import ConnectError
+from core.exceptions import VectorDbUnavailableException
 
-COLLECTION_NAME='eventizer_event_docs'
+COLLECTION_NAME = "eventizer_event_docs"
+
 
 def get_client():
-    return HttpClient(host="localhost", port=8001)
+    try:
+        return HttpClient(host="localhost", port=8001)
+    except ConnectError as e:
+        raise VectorDbUnavailableException("Connection Refused by chroma") from e
+    except Exception as e:
+        raise Exception from e
+
 
 def embed_text(texts, event_id, event_date):
     collection = get_client().get_or_create_collection(COLLECTION_NAME)

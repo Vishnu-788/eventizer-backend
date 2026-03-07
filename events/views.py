@@ -17,8 +17,9 @@ from .serializers import (
     EventDetailSerializer,
     SeatSerializer,
     EventListSerializer,
-    EventIdNameSerializer,
 )
+
+from core.exceptions import VectorDbUnavailableException
 
 
 class HostEventListView(ListAPIView):
@@ -36,7 +37,16 @@ class HostEventCreateView(CreateAPIView):
     def perform_create(self, serializer):
         host = self.request.user.host
         event = serializer.save(host=host)
-        create_embeddings(event)
+        try:
+            create_embeddings(event)
+        except VectorDbUnavailableException as e:
+            print(
+                f"Vector Embeddings skipped for the Event: {event.id} {event.e_title}"
+            )
+        except Exception as e:
+            print(
+                f"Exception Occured when creating embedding for the event: {event.id} {event.e_title}"
+            )
 
 
 class HostEventDetailView(RetrieveAPIView):

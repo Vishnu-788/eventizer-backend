@@ -1,0 +1,2 @@
+class VectorDbUnavailableException(Exception):
+    pass
