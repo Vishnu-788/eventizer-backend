@@ -85,10 +85,6 @@ class PayPalWebHook(GenericAPIView):
     def post(self, request, *args, **kwargs):
         event = request.data
         event_type = event.get("event_type")
-        print("\n====== PAYPAL WEBHOOK RECEIVED ======")
-        print("EVENT TYPE:", event.get("event_type"))
-        print(json.dumps(event, indent=2))
-        print("====== END WEBHOOK ======")
 
         if event_type == "CHECKOUT.ORDER.APPROVED":
             print("CHECKOUT.ORDER.APPROVED")

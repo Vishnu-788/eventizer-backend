@@ -45,7 +45,7 @@ class HostEventCreateView(CreateAPIView):
             )
         except Exception as e:
             print(
-                f"Exception Occured when creating embedding for the event: {event.id} {event.e_title}"
+                f"Exception Occurred when creating embedding for the event: {event.id} {event.e_title}"
             )
 
 
