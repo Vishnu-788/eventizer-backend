@@ -34,6 +34,13 @@ PAYPAL_BASE_URL = os.getenv('PAYPAL_BASE_URL')
 
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
+MYSQL_DATABASE_NAME = os.getenv('MYSQL_DATABASE_NAME')
+MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
+MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
+MYSQL_HOST = os.getenv('MYSQL_HOST')
+MYSQL_PORT = os.getenv('MYSQL_PORT')
+
+
 TIME_ZONE = 'Asia/Kolkata'
 USE_TZ = True
 
@@ -121,9 +128,13 @@ WSGI_APPLICATION = 'eventizer.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+     "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": MYSQL_DATABASE_NAME,
+        "USER": MYSQL_USERNAME,
+        "PASSWORD": MYSQL_PASSWORD,
+        "HOST": MYSQL_HOST,
+        "PORT": MYSQL_PORT,
     }
 }
 

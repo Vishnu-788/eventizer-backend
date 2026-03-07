@@ -9,7 +9,6 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 
 from auth_user.permissions import IsVerifiedHost
-from host_user.models import Host
 from llm_rag.services.llm_service import create_embeddings
 
 from .models import Event, Seat
