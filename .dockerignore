@@ -1,0 +1,66 @@
+# Python cache
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+
+.venv/
+venv/
+env/
+ENV/
+
+
+
+# Environment variables
+
+.env
+.env.*
+.env-docker
+
+# Django stuff
+
+*.log
+db.sqlite3
+media/
+staticfiles/
+
+# Git
+
+.git
+.gitignore
+
+# Node (if frontend lives in same repo)
+
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# IDE files
+
+.vscode/
+.idea/
+
+# OS garbage
+
+.DS_Store
+Thumbs.db
+
+# Testing
+
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Build artifacts
+
+dist/
+build/
+*.egg-info/
+
+# Docker itself
+
+Dockerfile
+docker-compose.yml
+.dockerignore
