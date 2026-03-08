@@ -126,12 +126,20 @@ def update_bookings_table(booking: Bookings, amount):
 
 def generate_ticket(booking: Bookings, amount):
     event = booking.event
+    print(f"""
+    EVENT ID: {event.id}
+    event name: {event.e_title}
+    event starts: {event.e_start_time}
+    event ends: {event.e_end_time}
+    """)
     expires = event.e_end_time
+    print("Event Expires at: ", expires)
     ticket = Ticket.objects.create(
         booking=booking,
         amount=amount,
         expires_at=expires
     )
+    print("Ticket expires at: ", ticket.expires_at)
     ticket.seats.set(booking.seats.all())
 
 def handle_payment_failed(event):

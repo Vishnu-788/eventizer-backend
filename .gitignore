@@ -28,6 +28,7 @@ staticfiles/
 # ========================
 *.env
 .env
+.env-docker
 
 # ========================
 # Migrations (optional)
@@ -55,5 +56,4 @@ host.json
 llm_rag/services/demo_embeddings.py
 llm_rag/services/test_llm.py
 
-.dockerignore
-Dockerfile
+

@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 
+from rest_framework import serializers
+from rest_framework_simplejwt.exceptions import TokenError
 from auth_user.enums import UserRoles
 from auth_user.models import User
 
@@ -22,6 +24,16 @@ def email_field():
         validators=[UniqueValidator(queryset=User.objects.all())],
     )
 
+class CustomTokenRefreshSerializer(TokenRefreshSerializer):
+
+    def validate(self, attrs):
+        try:
+            return super().validate(attrs)
+        except TokenError:
+            raise serializers.ValidationError({
+                "detail": "Refresh token is invalid or expired",
+                "code": "token_not_valid"
+            })
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):

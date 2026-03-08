@@ -6,8 +6,8 @@ from tickets.models import Ticket
 class TicketSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='booking.user.username', read_only=True)
     event_name = serializers.CharField(source='booking.event.e_title', read_only=True)
-    event_starts = serializers.TimeField(source='booking.event.e_start_time', read_only=True)
-    event_ends = serializers.TimeField(source='booking.event.e_end_time', read_only=True)
+    event_starts = serializers.DateTimeField(source='booking.event.e_start_time', read_only=True)
+    event_ends = serializers.DateTimeField(source='booking.event.e_end_time', read_only=True)
     seats = serializers.SerializerMethodField()
     class Meta:
         model = Ticket
