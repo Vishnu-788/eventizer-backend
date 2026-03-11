@@ -26,5 +26,4 @@ RUN --mount=type=cache,target=/root/.cache \
 
 COPY . .
 
-# Add this at the end of your Dockerfile
 CMD ["uv", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]

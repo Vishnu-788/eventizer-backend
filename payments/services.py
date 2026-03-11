@@ -3,9 +3,9 @@ from decimal import Decimal
 import requests
 from requests.auth import HTTPBasicAuth
 from django.conf import settings
-from datetime import datetime
 
-from analytics.services import update_daily_events_table, update_analytics_table
+
+from analytics.services import update_analytics_table
 from bookings.models import Bookings
 from payments.models import Payment
 from tickets.models import Ticket
@@ -14,8 +14,11 @@ from bookings.enums import BookingStatus
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 import pytz
+import logging
 
 IST = pytz.timezone("Asia/Kolkata")
+
+
 def get_paypal_token():
     url = "https://api-m.sandbox.paypal.com/v1/oauth2/token"
 
@@ -26,13 +29,10 @@ def get_paypal_token():
             "Accept": "application/json",
             "Accept-Language": "en_US",
         },
-        data={
-            "grant_type": "client_credentials"
-        }
+        data={"grant_type": "client_credentials"},
     )
     response.raise_for_status()
     return response.json()["access_token"]
-
 
 
 def create_paypal_order(payment):
@@ -50,16 +50,13 @@ def create_paypal_order(payment):
         "purchase_units": [
             {
                 "reference_id": str(payment.id),
-                "amount": {
-                    "currency_code": "USD",
-                    "value": str(payment.amount)
-                }
+                "amount": {"currency_code": "USD", "value": str(payment.amount)},
             }
         ],
         "application_context": {
             "return_url": "http://localhost:4200/payment/processing",
-            "cancel_url": "http://localhost:4200/payment/cancel"
-        }
+            "cancel_url": "http://localhost:4200/payment/cancel",
+        },
     }
 
     res = requests.post(url, json=body, headers=headers)
@@ -67,23 +64,29 @@ def create_paypal_order(payment):
 
     res.raise_for_status()
 
-    approval_url = next(link["href"] for link in data["links"] if link["rel"] == "approve")
+    approval_url = next(
+        link["href"] for link in data["links"] if link["rel"] == "approve"
+    )
     if res.status_code != 201:
         print("PAYPAL ERROR:", res.text)
         raise Exception("Order creation failed")
 
     return data["id"], approval_url
 
+
 def capture_paypal_order(paypal_order_id):
     access_token = get_paypal_token()
-    url = f"https://api-m.sandbox.paypal.com/v2/checkout/orders/{paypal_order_id}/capture"
+    url = (
+        f"https://api-m.sandbox.paypal.com/v2/checkout/orders/{paypal_order_id}/capture"
+    )
     requests.post(
         url,
         headers={
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {access_token}"
-        }
+            "Authorization": f"Bearer {access_token}",
+        },
     )
+
 
 def handle_checkout_approved(event):
     resource = event["resource"]
@@ -92,12 +95,15 @@ def handle_checkout_approved(event):
     payment_id = resource["purchase_units"][0]["reference_id"]
     payment = Payment.objects.get(id=payment_id)
     if payment.status != Status.CREATED:
-        print(f"Exited: Payment status is not pending. \nPayment ID: {payment_id}\nPayment Status: {payment.status}" )
+        print(
+            f"Exited: Payment status is not pending. \nPayment ID: {payment_id}\nPayment Status: {payment.status}"
+        )
         return
     payment.paypal_order_id = paypal_order_id
     payment.status = Status.APPROVED
     payment.save(update_fields=["paypal_order_id", "status"])
     capture_paypal_order(paypal_order_id)
+
 
 def handle_capture_completed(event):
     paypal_order_id = event["resource"]["supplementary_data"]["related_ids"]["order_id"]
@@ -118,29 +124,20 @@ def handle_capture_completed(event):
     update_bookings_table(payment.booking, amount)
     update_analytics_table(payment.booking, payment_date)
 
+
 def update_bookings_table(booking: Bookings, amount):
     booking.booking_status = BookingStatus.BOOKED
     booking.seats.update(booked=True)
     booking.save(update_fields=["booking_status"])
     generate_ticket(booking, amount)
 
+
 def generate_ticket(booking: Bookings, amount):
     event = booking.event
-    print(f"""
-    EVENT ID: {event.id}
-    event name: {event.e_title}
-    event starts: {event.e_start_time}
-    event ends: {event.e_end_time}
-    """)
     expires = event.e_end_time
-    print("Event Expires at: ", expires)
-    ticket = Ticket.objects.create(
-        booking=booking,
-        amount=amount,
-        expires_at=expires
-    )
-    print("Ticket expires at: ", ticket.expires_at)
+    ticket = Ticket.objects.create(booking=booking, amount=amount, expires_at=expires)
     ticket.seats.set(booking.seats.all())
+
 
 def handle_payment_failed(event):
     order_id = event["resource"]["supplementary_data"]["related_ids"]["order_id"]
@@ -149,10 +146,7 @@ def handle_payment_failed(event):
     if payment.status in (Status.REJECTED, Status.COMPLETED):
         print("PAYMENT FAILED")
         return
-    payment.status=Status.REJECTED
-    booking.booking_status=BookingStatus.CANCELLED
+    payment.status = Status.REJECTED
+    booking.booking_status = BookingStatus.CANCELLED
     payment.save(update_fields=["status"])
     booking.save(update_fields=["booking_status"])
-
-
-

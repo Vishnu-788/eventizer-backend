@@ -16,3 +16,15 @@ dependencies = [
     "pytz>=2025.2",
     "requests>=2.32.5",
 ]
+[tool.black]
+line-length = 88
+target-version = ['py313']
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | \.env
+  | build
+  | dist
+)/
+'''

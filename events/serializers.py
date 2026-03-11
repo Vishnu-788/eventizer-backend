@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import timedelta
 from django.utils import timezone
 
 from rest_framework import serializers
@@ -48,9 +48,7 @@ class EventSerializer(serializers.ModelSerializer):
 
         # Minimum duration 1 hour
         if (end - start) < timedelta(hours=1):
-            raise serializers.ValidationError(
-                "Event duration must be at least 1 hour."
-            )
+            raise serializers.ValidationError("Event duration must be at least 1 hour.")
 
         return data
 
