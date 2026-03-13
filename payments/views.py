@@ -13,7 +13,6 @@ from rest_framework.generics import (
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from auth_user.permissions import IsVerifiedHost
 from bookings.models import Bookings
 from bookings.enums import BookingStatus
 from .serializers import (
@@ -25,7 +24,6 @@ from .models import Payment
 from .services import (
     create_paypal_order,
     handle_checkout_approved,
-    update_bookings_table,
     handle_capture_completed,
     handle_payment_failed,
 )
