@@ -34,21 +34,28 @@ class EventSerializer(serializers.ModelSerializer):
 
         today = timezone.now().date()
 
+        if e_date < today:
+            raise serializers.ValidationError(
+                {"e_date": "Invalid date. Date is in past"}
+            )
+
         # Event must be at least 5 days from now
         if e_date < today + timedelta(days=5):
             raise serializers.ValidationError(
-                "Event date must be at least 5 days from today."
+                {"e_date": "Event date must be at least 5 days from today."}
             )
 
         # Start must be before end
         if start >= end:
             raise serializers.ValidationError(
-                "Event start time must be before end time."
+                {"e_end_time": "End time must be after start time."}
             )
 
         # Minimum duration 1 hour
         if (end - start) < timedelta(hours=1):
-            raise serializers.ValidationError("Event duration must be at least 1 hour.")
+            raise serializers.ValidationError(
+                {"e_end_time": "Event duration must be at least 1 hour."}
+            )
 
         return data
 
