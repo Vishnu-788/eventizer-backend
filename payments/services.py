@@ -4,18 +4,17 @@ import requests
 from requests.auth import HTTPBasicAuth
 from django.conf import settings
 
-
 from analytics.services import update_analytics_table
 from bookings.models import Bookings
 from payments.models import Payment
 from tickets.models import Ticket
 from .enums import Status
 from bookings.enums import BookingStatus
-from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 import pytz
 import logging
 
+logger = logging.getLogger(__name__)
 IST = pytz.timezone("Asia/Kolkata")
 
 
@@ -91,11 +90,10 @@ def capture_paypal_order(paypal_order_id):
 def handle_checkout_approved(event):
     resource = event["resource"]
     paypal_order_id = resource["id"]
-
     payment_id = resource["purchase_units"][0]["reference_id"]
     payment = Payment.objects.get(id=payment_id)
     if payment.status != Status.CREATED:
-        print(
+        logger.error(
             f"Exited: Payment status is not pending. \nPayment ID: {payment_id}\nPayment Status: {payment.status}"
         )
         return
@@ -103,32 +101,38 @@ def handle_checkout_approved(event):
     payment.status = Status.APPROVED
     payment.save(update_fields=["paypal_order_id", "status"])
     capture_paypal_order(paypal_order_id)
+    logger.debug("Checkout Approved")
 
 
 def handle_capture_completed(event):
     paypal_order_id = event["resource"]["supplementary_data"]["related_ids"]["order_id"]
     amount_str = event["resource"]["amount"]["value"]
     payment_time_utc = parse_datetime(event["resource"]["create_time"])
+    logger.debug(
+        f"Payment completed time: {payment_time_utc} Paypal Order ID: {paypal_order_id}"
+    )
 
     # Convert to IST for daily analytics grouping
     payment_time_ist = payment_time_utc.astimezone(IST)
-    payment_date = payment_time_ist.date()
+    logger.debug(f"Payment completed time converted to IST: {payment_time_ist}")
     amount = Decimal(amount_str)
     payment = Payment.objects.get(paypal_order_id=paypal_order_id)
     if payment.status != Status.APPROVED:
-        print("HANDLE CAPTURE RETURNED")
+        logger.error("Handle Capture Returned \nReason Payment status is not Approved")
         return
     payment.status = Status.COMPLETED
     payment.amount = amount
     payment.save(update_fields=["amount", "status"])
+    logger.debug("Payment Capture Complete. Updating bookings and analytics table.")
     update_bookings_table(payment.booking, amount)
-    update_analytics_table(payment.booking, payment_date)
+    update_analytics_table(payment.booking, payment_time_ist)
 
 
 def update_bookings_table(booking: Bookings, amount):
     booking.booking_status = BookingStatus.BOOKED
     booking.seats.update(booked=True)
     booking.save(update_fields=["booking_status"])
+    logger.debug("Booking status updated. Next Step: Generating Ticket.")
     generate_ticket(booking, amount)
 
 
@@ -137,12 +141,14 @@ def generate_ticket(booking: Bookings, amount):
     expires = event.e_end_time
     ticket = Ticket.objects.create(booking=booking, amount=amount, expires_at=expires)
     ticket.seats.set(booking.seats.all())
+    logger.debug("Tickets Generated.")
 
 
 def handle_payment_failed(event):
     order_id = event["resource"]["supplementary_data"]["related_ids"]["order_id"]
     payment = Payment.objects.select_related("booking").get(paypal_order_id=order_id)
     booking = payment.booking
+    logger.error(f"Payment Failed for order ID: {order_id}")
     if payment.status in (Status.REJECTED, Status.COMPLETED):
         print("PAYMENT FAILED")
         return

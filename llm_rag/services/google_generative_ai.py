@@ -21,4 +21,5 @@ def get_embeddings(texts):
 
 def llm_gemini_2_5_flash(prompt):
     client = get_client()
+    print("Request is sending to AI")
     return client.models.generate_content(model="gemini-2.5-flash", contents=prompt)

@@ -1,17 +1,19 @@
 from chromadb import HttpClient
+from django.conf import settings
 
 from .date_filter import get_date_filter
 from .google_generative_ai import get_embeddings
-from datetime import datetime
 from httpcore import ConnectError
 from core.exceptions import VectorDbUnavailableException
 
-COLLECTION_NAME = "eventizer_event_docs"
+COLLECTION_NAME = settings.CHROMADB_COLLECTION_NAME
+CHROMADB_HOST = settings.CHROMADB_HOST
+CHROMADB_PORT = settings.CHROMADB_PORT
 
 
 def get_client():
     try:
-        return HttpClient(host="localhost", port=8001)
+        return HttpClient(host=CHROMADB_HOST, port=CHROMADB_PORT)
     except ConnectError as e:
         raise VectorDbUnavailableException("Connection Refused by chroma") from e
     except Exception as e:

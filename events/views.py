@@ -5,6 +5,8 @@ from rest_framework.generics import (
     get_object_or_404,
     CreateAPIView,
 )
+
+from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.request import Request
 
@@ -64,8 +66,12 @@ For users, list all the events available on the platform.
 
 
 class EventListView(ListAPIView):
-    queryset = Event.objects.all()
     serializer_class = EventListSerializer
+
+    def get_queryset(self):
+        return Event.objects.filter(e_date__gte=timezone.now().date()).order_by(
+            "e_date", "e_start_time"
+        )
 
 
 class EventDetailView(RetrieveAPIView):
