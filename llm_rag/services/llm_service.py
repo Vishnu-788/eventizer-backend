@@ -1,6 +1,9 @@
 from datetime import datetime, time
 from .chroma_vector_db import query_text, embed_text
 from .google_generative_ai import llm_gemini_2_5_flash
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def prepare_prompt(docs, user_query):
@@ -28,9 +31,9 @@ def prepare_prompt(docs, user_query):
 
 def get_llm_response(user_query):
     retrieved_docs = query_text(user_query)["documents"]
-    print(f"Documents retrieved: {retrieved_docs}")
+    logger.debug(f"Retrieved documents for query '{user_query}': {retrieved_docs}")
     response = llm_gemini_2_5_flash(prepare_prompt(retrieved_docs, user_query))
-    print("Response: ", response)
+    logger.debug(f"LLM response for query '{user_query}': {response}")
     return response.candidates[0].content.parts[0].text
 
 

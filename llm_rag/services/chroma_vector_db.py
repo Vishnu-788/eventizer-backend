@@ -5,6 +5,9 @@ from .date_filter import get_date_filter
 from .google_generative_ai import get_embeddings
 from httpcore import ConnectError
 from core.exceptions import VectorDbUnavailableException
+import logging
+
+logger = logging.getLogger(__name__)
 
 COLLECTION_NAME = settings.CHROMADB_COLLECTION_NAME
 CHROMADB_HOST = settings.CHROMADB_HOST
@@ -15,8 +18,10 @@ def get_client():
     try:
         return HttpClient(host=CHROMADB_HOST, port=CHROMADB_PORT)
     except ConnectError as e:
+        logger.error("Connection to ChromaDB failed: %s", e)
         raise VectorDbUnavailableException("Connection Refused by chroma") from e
     except Exception as e:
+        logger.error("Unexpected error occurred: %s", e)
         raise Exception from e
 
 
@@ -37,7 +42,7 @@ def query_text(query):
     collection = client.get_collection(COLLECTION_NAME)
 
     date_filter = get_date_filter(query)
-    print(date_filter)
+    logger.debug("Date filter for query '%s': %s", query, date_filter)
     return collection.query(
         query_embeddings=get_embeddings(query), n_results=6, where=date_filter
     )
