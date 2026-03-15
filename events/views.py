@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 
 from auth_user.permissions import IsVerifiedHost
-from llm_rag.services.llm_service import create_embeddings
+from llm_rag.tasks import create_embeddings
 
 from .models import Event, Seat
 from .serializers import (
@@ -22,6 +22,7 @@ from .serializers import (
 )
 
 from core.exceptions import VectorDbUnavailableException
+from django.db import transaction
 
 
 class HostEventListView(ListAPIView):
@@ -39,16 +40,7 @@ class HostEventCreateView(CreateAPIView):
     def perform_create(self, serializer):
         host = self.request.user.host
         event = serializer.save(host=host)
-        try:
-            create_embeddings(event)
-        except VectorDbUnavailableException as e:
-            print(
-                f"Vector Embeddings skipped for the Event: {event.id} {event.e_title}"
-            )
-        except Exception as e:
-            print(
-                f"Exception Occurred when creating embedding for the event: {event.id} {event.e_title}"
-            )
+        transaction.on_commit(lambda: create_embeddings.delay(event.id))
 
 
 class HostEventDetailView(RetrieveAPIView):

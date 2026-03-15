@@ -1,5 +1,5 @@
-from datetime import datetime, time
-from .chroma_vector_db import query_text, embed_text
+from datetime import datetime
+from .chroma_vector_db import query_text
 from .google_generative_ai import llm_gemini_2_5_flash
 import logging
 
@@ -71,15 +71,3 @@ def get_llm_response(user_query):
     response = llm_gemini_2_5_flash(prepare_prompt(retrieved_docs, user_query))
     logger.debug(f"LLM response for query '{user_query}': {response}")
     return response.candidates[0].content.parts[0].text
-
-
-def create_embeddings(event):
-    text = f"""
-    The name of the event is {event.e_title}.
-    The event type/category of the event is {event.e_category}
-    The event will happen on {event.e_date} from {event.e_start_time} to {event.e_end_time}
-    the details of the event,  {event.e_description}
-    Location/venues of the event : {event.e_venue}
-    """
-
-    embed_text(text, event.id, event.e_start_time)
